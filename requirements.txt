@@ -1,0 +1,4 @@
+# Add Python dependencies for custom modules here
+# Example:
+# requests==2.31.0
+# phonenumbers==8.13.0

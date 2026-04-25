@@ -1,0 +1,18 @@
+# Development overrides: hot-reload addons, debugger, exposed DB port
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+services:
+  db:
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  odoo:
+    build: .
+    ports:
+      - "${ODOO_PORT:-8069}:8069"
+      - "8072:8072"   # longpolling / live chat
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./config/odoo.dev.conf:/etc/odoo/odoo.conf:ro
+      - ./addons:/mnt/extra-addons  # writable for scaffolding
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
