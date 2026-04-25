@@ -5,13 +5,13 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
 
-  odoo:
+  erp:
     build: .
     ports:
       - "${ODOO_PORT:-8069}:8069"
       - "8072:8072"   # longpolling / live chat
     volumes:
-      - odoo_data:/var/lib/odoo
+      - erp_data:/var/lib/odoo
       - ./config/odoo.dev.conf:/etc/odoo/odoo.conf:ro
       - ./addons:/mnt/extra-addons  # writable for scaffolding
     environment:
