@@ -223,3 +223,6 @@ __marimo__/
 .claude/
 .codex/
 
+# Superpowers brainstorm sessions
+.superpowers/
+
