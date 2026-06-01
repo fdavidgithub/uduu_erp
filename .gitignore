@@ -5,7 +5,7 @@
 .claude/settings.local.json
 
 # Docker volumes (never commit data directories)
-data/
+/data/
 
 # Odoo
 *.pyc
