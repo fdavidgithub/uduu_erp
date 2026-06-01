@@ -15,6 +15,6 @@ export class ChatObserverCard extends Component {
     };
 
     get statusLabel() {
-        return STATUS_LABELS[this.props.chat.color] || this.props.chat.color.toUpperCase();
+        return STATUS_LABELS[this.props.chat.color] || (this.props.chat.color || "").toUpperCase();
     }
 }

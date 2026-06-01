@@ -74,6 +74,7 @@ class ChatObserverDashboard extends Component {
     }
 
     async openChat(chat) {
+        if (!chat.phone_number) return;
         this.state.selectedChat = chat;
         this.state.modalHistory = [];
         this.state.modalLoading = true;

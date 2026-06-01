@@ -73,7 +73,7 @@
                                     <t t-esc="state.selectedChat.elapsed_minutes"/>min
                                 </span>
                             </div>
-                            <button class="o_chat_modal__close" t-on-click="closeModal">✕</button>
+                            <button class="o_chat_modal__close" t-on-click="closeModal" title="Fechar" aria-label="Fechar">✕</button>
                         </div>
 
                         <div class="o_chat_modal__history">
