@@ -1,0 +1,94 @@
+import json
+import requests
+
+from odoo import http
+from odoo.http import request
+
+from odoo.addons.chat_observer.utils.chat_phases import process_chats
+
+
+def _json_response(data, status=200):
+    return request.make_response(
+        json.dumps(data),
+        headers=[("Content-Type", "application/json")],
+        status=status,
+    )
+
+
+def _get_param(key, default=""):
+    return request.env["ir.config_parameter"].sudo().get_param(key, default)
+
+
+class ChatObserverController(http.Controller):
+
+    @http.route("/chat_observer/chats", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_chats(self):
+        api_base_url = _get_param("chat_observer.api_base_url")
+        if not api_base_url:
+            return _json_response({"error": "api_not_configured"})
+
+        api_chats_path = _get_param("chat_observer.api_chats_path", "/chats/phases")
+        yellow_threshold = int(_get_param("chat_observer.yellow_threshold", "5"))
+
+        try:
+            resp = requests.get(f"{api_base_url}{api_chats_path}", timeout=10)
+            resp.raise_for_status()
+            raw_chats = resp.json()
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return _json_response({"error": "api_unavailable"})
+        except requests.exceptions.HTTPError:
+            return _json_response({"error": "api_error", "status": resp.status_code})
+
+        return _json_response(process_chats(raw_chats, yellow_threshold))
+
+    @http.route("/chat_observer/history/<phone>", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_history(self, phone):
+        if not phone.isdigit():
+            return _json_response({"error": "invalid_phone"}, status=400)
+
+        api_base_url = _get_param("chat_observer.api_base_url")
+        if not api_base_url:
+            return _json_response({"error": "api_not_configured"})
+
+        path = _get_param("chat_observer.api_history_path", "/chats/{phone}/history").replace("{phone}", phone)
+
+        try:
+            resp = requests.get(f"{api_base_url}{path}", timeout=10)
+            if resp.status_code == 404:
+                return _json_response({"error": "not_found"}, status=404)
+            resp.raise_for_status()
+            return request.make_response(resp.text, headers=[("Content-Type", "application/json")])
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return _json_response({"error": "api_unavailable"})
+        except requests.exceptions.HTTPError:
+            return _json_response({"error": "api_error", "status": resp.status_code})
+
+    @http.route("/chat_observer/send", type="http", auth="user", methods=["POST"], csrf=False)
+    def send_message(self):
+        try:
+            body = json.loads(request.httprequest.data)
+        except (ValueError, KeyError):
+            return _json_response({"error": "invalid_payload"}, status=400)
+
+        phone_number = body.get("phone_number", "")
+        message = body.get("message", "").strip()
+
+        if not phone_number.isdigit():
+            return _json_response({"error": "invalid_phone"}, status=400)
+        if not message:
+            return _json_response({"error": "empty_message"}, status=400)
+
+        api_base_url = _get_param("chat_observer.api_base_url")
+        if not api_base_url:
+            return _json_response({"error": "api_not_configured"})
+
+        path = _get_param("chat_observer.api_send_path", "/chats/{phone}/message").replace("{phone}", phone_number)
+
+        try:
+            resp = requests.post(f"{api_base_url}{path}", json={"message": message}, timeout=10)
+            resp.raise_for_status()
+            return _json_response({"success": True})
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return _json_response({"error": "api_unavailable"})
+        except requests.exceptions.HTTPError:
+            return _json_response({"error": "send_failed"})
