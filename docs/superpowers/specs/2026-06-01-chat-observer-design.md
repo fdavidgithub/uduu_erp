@@ -76,13 +76,32 @@ Criados em `data/chat_observer_data.xml` com valores padrão na instalação. Ed
 **Arquivo:** `controllers/chat_observer.py`  
 **Autenticação:** `auth="user"` em todos os endpoints — apenas usuários autenticados no Odoo.
 
-### Endpoints
+### Endpoints expostos ao browser (Odoo controller)
+
+Estes são os endpoints que o componente OWL chama. O controller os implementa como proxy da API externa — a API externa retorna apenas fases e timestamps, sem cores ou KPIs.
 
 | Rota | Método | Descrição |
 |---|---|---|
-| `/chat_observer/chats` | GET | Retorna lista de chats com cor calculada + KPIs |
-| `/chat_observer/history/<phone>` | GET | Retorna histórico completo do chat |
-| `/chat_observer/send` | POST | Envia mensagem para o cliente |
+| `/chat_observer/chats` | GET | Busca fases na API externa, calcula cores e KPIs internamente, retorna resultado ao browser |
+| `/chat_observer/history/<phone>` | GET | Repassa histórico completo do chat retornado pela API externa |
+| `/chat_observer/send` | POST | Repassa mensagem livre do operador à API externa |
+
+### Contrato da API externa (lida pelo controller)
+
+A API externa retorna somente fases e timestamps — sem cores, sem KPIs. O controller é o único responsável por calcular essas informações.
+
+Exemplo do payload recebido da API externa em `GET {api_base_url}{api_chats_path}`:
+
+```json
+[
+  {
+    "phone_number": "5511999990001",
+    "phase": "operator",
+    "updated_at": "2026-06-01T10:42:00Z",
+    "collected": { "product": true, "customer": false, "address": false, "payment": false }
+  }
+]
+```
 
 ### Lógica de `/chat_observer/chats`
 
