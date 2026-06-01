@@ -1,2 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<templates/>
+<templates xml:space="preserve">
+    <t t-name="chat_observer.Dashboard">
+        <div class="o_chat_observer">
+
+            <!-- Banner de erro -->
+            <t t-if="state.error">
+                <div class="o_chat_observer__error">
+                    <t t-if="state.error === 'api_not_configured'">
+                        API não configurada. Defina
+                        <strong>chat_observer.api_base_url</strong>
+                        em Configurações → Parâmetros do Sistema.
+                    </t>
+                    <t t-elif="state.error === 'api_unavailable'">
+                        API externa indisponível. Tentando reconectar...
+                    </t>
+                    <t t-else="">
+                        Erro ao carregar chats. Tentando novamente...
+                    </t>
+                </div>
+            </t>
+
+            <!-- KPIs -->
+            <div class="o_chat_observer__kpis">
+                <div class="o_chat_kpi o_chat_kpi--neutral">
+                    <span class="o_chat_kpi__value" t-esc="state.kpis.total"/>
+                    <span class="o_chat_kpi__label">TOTAL</span>
+                </div>
+                <div class="o_chat_kpi o_chat_kpi--green">
+                    <span class="o_chat_kpi__value" t-esc="state.kpis.in_progress"/>
+                    <span class="o_chat_kpi__label">ANDAMENTO</span>
+                </div>
+                <div class="o_chat_kpi o_chat_kpi--yellow">
+                    <span class="o_chat_kpi__value" t-esc="state.kpis.attention"/>
+                    <span class="o_chat_kpi__label">ATENÇÃO</span>
+                </div>
+                <div class="o_chat_kpi o_chat_kpi--red">
+                    <span class="o_chat_kpi__value" t-esc="state.kpis.action_required"/>
+                    <span class="o_chat_kpi__label">REQUER AÇÃO</span>
+                </div>
+            </div>
+
+            <!-- Grid de cards -->
+            <div class="o_chat_observer__grid">
+                <t t-foreach="state.chats" t-as="chat" t-key="chat.phone_number">
+                    <ChatObserverCard chat="chat" onOpen.bind="openChat"/>
+                </t>
+                <t t-if="!state.error and state.chats.length === 0">
+                    <div class="o_chat_observer__empty">Nenhum chat em andamento.</div>
+                </t>
+            </div>
+
+            <!-- Indicador de atualização -->
+            <div class="o_chat_observer__footer">
+                <span t-if="state.lastUpdated">
+                    ↻ atualizado há <t t-esc="state.secondsSinceUpdate"/>s
+                </span>
+            </div>
+
+            <!-- Modal de detalhe -->
+            <t t-if="state.selectedChat">
+                <div class="o_chat_modal_overlay" t-on-click="closeModal">
+                    <div class="o_chat_modal" t-on-click.stop="">
+                        <div class="o_chat_modal__header">
+                            <div>
+                                <strong t-esc="state.selectedChat.phone_number"/>
+                                <span
+                                    class="o_chat_badge"
+                                    t-att-class="'o_chat_badge--' + state.selectedChat.color"
+                                >
+                                    <t t-esc="state.selectedChat.phase"/>
+                                    <span> · </span>
+                                    <t t-esc="state.selectedChat.elapsed_minutes"/>min
+                                </span>
+                            </div>
+                            <button class="o_chat_modal__close" t-on-click="closeModal">✕</button>
+                        </div>
+
+                        <div class="o_chat_modal__history">
+                            <t t-if="state.modalLoading">
+                                <div class="o_chat_modal__loading">Carregando histórico...</div>
+                            </t>
+                            <t t-elif="state.modalError">
+                                <div class="o_chat_modal__error">
+                                    Erro ao carregar histórico.
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <t t-foreach="state.modalHistory" t-as="msg" t-key="msg_index">
+                                    <div
+                                        class="o_chat_msg"
+                                        t-att-class="'o_chat_msg--' + (msg.role || 'unknown')"
+                                    >
+                                        <span class="o_chat_msg__role" t-esc="msg.role"/>
+                                        <span class="o_chat_msg__text" t-esc="msg.content"/>
+                                    </div>
+                                </t>
+                                <t t-if="state.modalHistory.length === 0">
+                                    <div class="o_chat_modal__empty">Sem histórico disponível.</div>
+                                </t>
+                            </t>
+                        </div>
+
+                        <div class="o_chat_modal__footer">
+                            <input
+                                class="o_chat_modal__input"
+                                type="text"
+                                placeholder="Digite uma mensagem..."
+                                t-model="state.sendMessage"
+                                t-on-keydown="onInputKeydown"
+                            />
+                            <button
+                                class="o_chat_modal__send"
+                                t-att-disabled="state.sendLoading or !state.sendMessage.trim()"
+                                t-on-click="sendMessage"
+                            >
+                                <t t-if="state.sendLoading">...</t>
+                                <t t-else="">Enviar</t>
+                            </button>
+                        </div>
+                        <t t-if="state.sendError">
+                            <div class="o_chat_modal__send_error">
+                                Falha ao enviar mensagem. Tente novamente.
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+
+        </div>
+    </t>
+</templates>
