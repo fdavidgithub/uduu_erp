@@ -7,6 +7,7 @@
     "category": "Customizations",
     "license": "LGPL-3",
     "depends": ["uduu_base", "web"],
+    "demo": [],
     "data": [
         "security/ir.model.access.csv",
         "data/chat_observer_data.xml",
