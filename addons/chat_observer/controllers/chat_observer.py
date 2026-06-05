@@ -28,13 +28,13 @@ class ChatObserverController(http.Controller):
 
     @http.route("/chat_observer/chats", type="http", auth="user", methods=["GET"], csrf=False)
     def get_chats(self):
-        api_base_url = _get_param("chat_observer.api_base_url")
+        api_base_url = _get_param("uduu_common.api_base_url")
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
-        api_chats_path = _get_param("chat_observer.api_chats_path", "/chats/phases")
+        api_chats_path = _get_param("uduu_chat_observer.api_chats_path", "/chats/phases")
         try:
-            yellow_threshold = int(_get_param("chat_observer.yellow_threshold", "5"))
+            yellow_threshold = int(_get_param("uduu_chat_observer.yellow_threshold", "5"))
         except ValueError:
             yellow_threshold = 5
 
@@ -56,11 +56,11 @@ class ChatObserverController(http.Controller):
         if not phone.isdigit() or not (7 <= len(phone) <= 15):
             return _json_response({"error": "invalid_phone"}, status=400)
 
-        api_base_url = _get_param("chat_observer.api_base_url")
+        api_base_url = _get_param("uduu_common.api_base_url")
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
-        path = _get_param("chat_observer.api_history_path", "/uduu/chats/history")
+        path = _get_param("uduu_chat_observer.api_history_path", "/uduu/chats/history")
 
         try:
             resp = requests.get(f"{api_base_url}{path}", params={"phone": phone}, timeout=10)
@@ -90,12 +90,12 @@ class ChatObserverController(http.Controller):
         if not message:
             return _json_response({"error": "empty_message"}, status=400)
 
-        api_base_url = _get_param("chat_observer.api_base_url")
+        api_base_url = _get_param("uduu_common.api_base_url")
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
-        path = _get_param("chat_observer.api_send_path", "/meta/whatsapp/webhooks")
-        phone_number_id = _get_param("chat_observer.wa_phone_number_id", "")
+        path = _get_param("uduu_chat_observer.api_send_path", "/meta/whatsapp/webhooks")
+        phone_number_id = _get_param("uduu_chat_observer.wa_phone_number_id", "")
 
         payload = {
             "object": "whatsapp_business_account",
