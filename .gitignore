@@ -1,11 +1,8 @@
-# Environment & secrets
-.env
-
 # Claude Code local settings (user-specific, not shared)
 .claude/settings.local.json
 
 # Docker volumes (never commit data directories)
-data/
+/data/
 
 # Odoo
 *.pyc
@@ -156,6 +153,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+*.session
 
 # Spyder project settings
 .spyderproject
@@ -222,4 +220,7 @@ __marimo__/
 # Agents
 .claude/
 .codex/
+
+# Superpowers brainstorm sessions
+.superpowers/
 

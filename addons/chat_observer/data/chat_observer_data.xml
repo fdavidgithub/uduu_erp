@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="param_api_base_url" model="ir.config_parameter">
+        <field name="key">chat_observer.api_base_url</field>
+        <field name="value"></field>
+    </record>
+    <record id="param_api_chats_path" model="ir.config_parameter">
+        <field name="key">chat_observer.api_chats_path</field>
+        <field name="value">/chats/phases</field>
+    </record>
+    <record id="param_api_history_path" model="ir.config_parameter">
+        <field name="key">chat_observer.api_history_path</field>
+        <field name="value">/chats/{phone}/history</field>
+    </record>
+    <record id="param_api_send_path" model="ir.config_parameter">
+        <field name="key">chat_observer.api_send_path</field>
+        <field name="value">/meta/whatsapp/webhooks</field>
+    </record>
+    <record id="param_wa_phone_number_id" model="ir.config_parameter">
+        <field name="key">chat_observer.wa_phone_number_id</field>
+        <field name="value"></field>
+    </record>
+    <record id="param_history_refresh_interval" model="ir.config_parameter">
+        <field name="key">chat_observer.history_refresh_interval</field>
+        <field name="value">5</field>
+    </record>
+    <record id="param_refresh_interval" model="ir.config_parameter">
+        <field name="key">chat_observer.refresh_interval</field>
+        <field name="value">30</field>
+    </record>
+    <record id="param_yellow_threshold" model="ir.config_parameter">
+        <field name="key">chat_observer.yellow_threshold</field>
+        <field name="value">5</field>
+    </record>
+</odoo>

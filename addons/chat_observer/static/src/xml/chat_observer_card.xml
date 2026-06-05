@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="chat_observer.Card">
+        <div
+            class="o_chat_card"
+            t-att-class="'o_chat_card--' + props.chat.color"
+            t-on-click="() => props.onOpen(props.chat)"
+        >
+            <div class="o_chat_card__status">
+                <span class="o_chat_card__dot">■</span>
+                <span t-esc="statusLabel"/>
+            </div>
+            <div class="o_chat_card__phone" t-esc="props.chat.phone_number"/>
+            <div class="o_chat_card__info">
+                <span t-esc="props.chat.phase"/>
+                <span> · </span>
+                <span t-esc="props.chat.elapsed_minutes"/>
+                <span>min</span>
+            </div>
+        </div>
+    </t>
+</templates>

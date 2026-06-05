@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_chat_observer_dashboard" model="ir.actions.client">
+        <field name="name">Chat Observer</field>
+        <field name="tag">chat_observer.dashboard</field>
+    </record>
+
+    <menuitem
+        id="menu_chat_observer_root"
+        name="Chat Observer"
+        action="action_chat_observer_dashboard"
+        sequence="100"
+    />
+</odoo>

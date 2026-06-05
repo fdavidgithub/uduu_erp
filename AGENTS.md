@@ -37,7 +37,7 @@ O PostgreSQL cria o banco vazio. Na **primeira vez**, inicialize as tabelas do O
 
 ```bash
 docker compose up -d db
-docker compose run --rm odoo odoo -i base -d odoo --without-demo=all --stop-after-init
+docker compose run --rm odoo odoo -i base -d uduu --without-demo=all --stop-after-init
 docker compose up -d
 ```
 
