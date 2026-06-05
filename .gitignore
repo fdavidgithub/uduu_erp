@@ -1,6 +1,3 @@
-# Environment & secrets
-.env
-
 # Claude Code local settings (user-specific, not shared)
 .claude/settings.local.json
 
@@ -156,6 +153,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+*.session
 
 # Spyder project settings
 .spyderproject
