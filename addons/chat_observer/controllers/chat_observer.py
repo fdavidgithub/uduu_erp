@@ -1,5 +1,7 @@
 import json
 import logging
+import time
+
 import requests
 
 from odoo import http
@@ -58,10 +60,10 @@ class ChatObserverController(http.Controller):
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
-        path = _get_param("chat_observer.api_history_path", "/chats/{phone}/history").replace("{phone}", phone)
+        path = _get_param("chat_observer.api_history_path", "/uduu/chats/history")
 
         try:
-            resp = requests.get(f"{api_base_url}{path}", timeout=10)
+            resp = requests.get(f"{api_base_url}{path}", params={"phone": phone}, timeout=10)
             if resp.status_code == 404:
                 return _json_response({"error": "not_found"}, status=404)
             resp.raise_for_status()
@@ -70,7 +72,7 @@ class ChatObserverController(http.Controller):
             _logger.warning("chat_observer: API unavailable: %s", e)
             return _json_response({"error": "api_unavailable"})
         except requests.exceptions.HTTPError as e:
-            _logger.warning("chat_observer: API error %s: %s", resp.status_code, e)
+            _logger.warning("chat_observer: API error %s: %s | body: %s", resp.status_code, e, resp.text[:500])
             return _json_response({"error": "api_error", "status": resp.status_code})
 
     @http.route("/chat_observer/send", type="http", auth="user", methods=["POST"], csrf=False)
@@ -92,10 +94,47 @@ class ChatObserverController(http.Controller):
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
-        path = _get_param("chat_observer.api_send_path", "/chats/{phone}/message").replace("{phone}", phone_number)
+        path = _get_param("chat_observer.api_send_path", "/meta/whatsapp/webhooks")
+        phone_number_id = _get_param("chat_observer.wa_phone_number_id", "")
+
+        payload = {
+            "object": "whatsapp_business_account",
+            "entry": [
+                {
+                    "id": "",
+                    "changes": [
+                        {
+                            "value": {
+                                "messaging_product": "whatsapp",
+                                "metadata": {
+                                    "display_phone_number": "",
+                                    "phone_number_id": phone_number_id,
+                                },
+                                "contacts": [
+                                    {
+                                        "profile": {"name": ""},
+                                        "wa_id": phone_number,
+                                    }
+                                ],
+                                "messages": [
+                                    {
+                                        "from": phone_number,
+                                        "id": "",
+                                        "timestamp": str(int(time.time())),
+                                        "text": {"body": message},
+                                        "type": "text",
+                                    }
+                                ],
+                            },
+                            "field": "messages",
+                        }
+                    ],
+                }
+            ],
+        }
 
         try:
-            resp = requests.post(f"{api_base_url}{path}", json={"message": message}, timeout=10)
+            resp = requests.post(f"{api_base_url}{path}", json=payload, timeout=10)
             resp.raise_for_status()
             return _json_response({"success": True})
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:

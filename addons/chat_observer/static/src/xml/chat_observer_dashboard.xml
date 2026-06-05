@@ -76,7 +76,7 @@
                             <button class="o_chat_modal__close" t-on-click="closeModal" title="Fechar" aria-label="Fechar">✕</button>
                         </div>
 
-                        <div class="o_chat_modal__history">
+                        <div class="o_chat_modal__history" t-ref="historyContainer">
                             <t t-if="state.modalLoading">
                                 <div class="o_chat_modal__loading">Carregando histórico...</div>
                             </t>
@@ -91,8 +91,11 @@
                                         class="o_chat_msg"
                                         t-att-class="'o_chat_msg--' + (msg.role || 'unknown')"
                                     >
-                                        <span class="o_chat_msg__role" t-esc="msg.role"/>
-                                        <span class="o_chat_msg__text" t-esc="msg.content"/>
+                                        <span class="o_chat_msg__meta">
+                                            <span class="o_chat_msg__role" t-esc="msg.role"/>
+                                            <span class="o_chat_msg__date" t-esc="formatMsgDate(msg.created_at)"/>
+                                        </span>
+                                        <span class="o_chat_msg__text" t-esc="msg.message"/>
                                     </div>
                                 </t>
                                 <t t-if="state.modalHistory.length === 0">

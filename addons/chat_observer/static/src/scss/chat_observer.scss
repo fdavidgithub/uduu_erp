@@ -250,12 +250,23 @@
     flex-direction: column;
     gap: 2px;
 
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
     &__role {
         font-size: 0.65rem;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
         color: #6c757d;
+    }
+
+    &__date {
+        font-size: 0.62rem;
+        color: #adb5bd;
     }
 
     &__text {

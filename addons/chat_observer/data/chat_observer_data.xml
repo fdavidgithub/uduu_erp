@@ -14,7 +14,15 @@
     </record>
     <record id="param_api_send_path" model="ir.config_parameter">
         <field name="key">chat_observer.api_send_path</field>
-        <field name="value">/chats/{phone}/message</field>
+        <field name="value">/meta/whatsapp/webhooks</field>
+    </record>
+    <record id="param_wa_phone_number_id" model="ir.config_parameter">
+        <field name="key">chat_observer.wa_phone_number_id</field>
+        <field name="value"></field>
+    </record>
+    <record id="param_history_refresh_interval" model="ir.config_parameter">
+        <field name="key">chat_observer.history_refresh_interval</field>
+        <field name="value">5</field>
     </record>
     <record id="param_refresh_interval" model="ir.config_parameter">
         <field name="key">chat_observer.refresh_interval</field>

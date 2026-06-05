@@ -1,5 +1,5 @@
 /** @odoo-module **/
-import { Component, useState, onMounted, onWillUnmount } from "@odoo/owl";
+import { Component, useState, onMounted, onWillUnmount, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ChatObserverCard } from "./chat_observer_card";
@@ -24,8 +24,10 @@ class ChatObserverDashboard extends Component {
             sendMessage: "",
             sendError: false,
         });
+        this.historyRef = useRef("historyContainer");
         this._pollInterval = null;
         this._clockInterval = null;
+        this._historyInterval = null;
 
         onMounted(async () => {
             const interval = await this._getRefreshInterval();
@@ -37,6 +39,7 @@ class ChatObserverDashboard extends Component {
         onWillUnmount(() => {
             clearInterval(this._pollInterval);
             clearInterval(this._clockInterval);
+            clearInterval(this._historyInterval);
         });
     }
 
@@ -73,30 +76,65 @@ class ChatObserverDashboard extends Component {
         }
     }
 
+    _scrollHistoryToBottom() {
+        setTimeout(() => {
+            const el = this.historyRef.el;
+            if (el) el.scrollTop = el.scrollHeight;
+        }, 0);
+    }
+
+    async _fetchHistory(phone) {
+        try {
+            const resp = await fetch(`/chat_observer/history/${phone}`);
+            const data = await resp.json();
+            if (!Array.isArray(data) && data.error) {
+                this.state.modalError = true;
+            } else {
+                this.state.modalError = false;
+                this.state.modalHistory = Array.isArray(data) ? data : (data.history || []);
+                this._scrollHistoryToBottom();
+            }
+        } catch {
+            this.state.modalError = true;
+        }
+    }
+
     async openChat(chat) {
         if (!chat.phone_number) return;
+        clearInterval(this._historyInterval);
         this.state.selectedChat = chat;
         this.state.modalHistory = [];
         this.state.modalLoading = true;
         this.state.modalError = false;
         this.state.sendMessage = "";
         this.state.sendError = false;
-        try {
-            const resp = await fetch(`/chat_observer/history/${chat.phone_number}`);
-            const data = await resp.json();
-            if (data.error) {
-                this.state.modalError = true;
-            } else {
-                this.state.modalHistory = data.history || [];
+
+        await this._fetchHistory(chat.phone_number);
+        this.state.modalLoading = false;
+
+        const intervalSec = await this.orm.call(
+            "ir.config_parameter",
+            "get_param",
+            ["chat_observer.history_refresh_interval", "5"]
+        );
+        const ms = (parseInt(intervalSec) || 5) * 1000;
+        this._historyInterval = setInterval(() => {
+            if (this.state.selectedChat) {
+                this._fetchHistory(this.state.selectedChat.phone_number);
             }
-        } catch {
-            this.state.modalError = true;
-        } finally {
-            this.state.modalLoading = false;
-        }
+        }, ms);
+    }
+
+    formatMsgDate(isoString) {
+        if (!isoString) return "";
+        const d = new Date(isoString);
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
     closeModal() {
+        clearInterval(this._historyInterval);
+        this._historyInterval = null;
         this.state.selectedChat = null;
         this.state.modalHistory = [];
         this.state.sendMessage = "";
@@ -128,6 +166,7 @@ class ChatObserverDashboard extends Component {
                 this.state.sendError = true;
             } else {
                 this.state.sendMessage = "";
+                await this._fetchHistory(this.state.selectedChat.phone_number);
             }
         } catch {
             this.state.sendError = true;
