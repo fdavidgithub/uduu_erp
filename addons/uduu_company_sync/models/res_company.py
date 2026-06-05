@@ -74,6 +74,11 @@ class ResCompany(models.Model):
             raise UserError(
                 f"Erro na API ao sincronizar empresa: HTTP {resp.status_code}."
             ) from e
+        except requests.exceptions.RequestException as e:
+            _logger.error("uduu_company_sync: unexpected request error: %s", e)
+            raise UserError(
+                f"Erro inesperado ao sincronizar com a API ({base_url})."
+            ) from e
 
     @api.model_create_multi
     def create(self, vals_list):
