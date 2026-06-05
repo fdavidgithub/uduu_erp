@@ -18,8 +18,14 @@ def migrate(cr, version):
     }
     for old_key, new_key in renames.items():
         cr.execute(
-            "UPDATE ir_config_parameter SET key = %s WHERE key = %s",
-            (new_key, old_key),
+            """
+            UPDATE ir_config_parameter SET key = %s
+            WHERE key = %s
+              AND NOT EXISTS (
+                  SELECT 1 FROM ir_config_parameter WHERE key = %s
+              )
+            """,
+            (new_key, old_key, new_key),
         )
         if cr.rowcount:
             _logger.info("uduu: renamed ir.config_parameter %s → %s", old_key, new_key)

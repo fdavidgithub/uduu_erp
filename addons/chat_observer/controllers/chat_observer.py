@@ -60,7 +60,7 @@ class ChatObserverController(http.Controller):
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
-        path = _get_param("uduu_chat_observer.api_history_path", "/uduu/chats/history")
+        path = _get_param("uduu_chat_observer.api_history_path", "/chats/{phone}/history")
 
         try:
             resp = requests.get(f"{api_base_url}{path}", params={"phone": phone}, timeout=10)
