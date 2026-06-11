@@ -47,7 +47,7 @@ class ChatObserverDashboard extends Component {
         const val = await this.orm.call(
             "ir.config_parameter",
             "get_param",
-            ["chat_observer.refresh_interval", "30"]
+            ["uduu_chat_observer.refresh_interval", "30"]
         );
         return parseInt(val) || 30;
     }
@@ -115,7 +115,7 @@ class ChatObserverDashboard extends Component {
         const intervalSec = await this.orm.call(
             "ir.config_parameter",
             "get_param",
-            ["chat_observer.history_refresh_interval", "5"]
+            ["uduu_chat_observer.history_refresh_interval", "5"]
         );
         const ms = (parseInt(intervalSec) || 5) * 1000;
         this._historyInterval = setInterval(() => {
