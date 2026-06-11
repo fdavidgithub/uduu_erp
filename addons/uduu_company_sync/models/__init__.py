@@ -1,1 +1,1 @@
-from . import res_company
+from . import res_company, res_partner

@@ -1,22 +1,15 @@
 import logging
-
+import re
 import requests
 
-from odoo import api, fields, models
+from odoo import api, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-SYNC_FIELDS = {
-    "name", "phone", "email", "website", "street", "street2",
-    "city", "state_id", "zip", "country_id", "description",
-}
-
 
 class ResCompany(models.Model):
     _inherit = "res.company"
-
-    description = fields.Text(string="Descrição")
 
     def _get_param(self, key, default=""):
         return self.env["ir.config_parameter"].sudo().get_param(key, default)
@@ -26,13 +19,14 @@ class ResCompany(models.Model):
         street_parts = (self.street or "").split(",", 1)
         street_name = street_parts[0].strip()
         street_number = street_parts[1].strip() if len(street_parts) > 1 else ""
+        description = re.sub(r"<[^>]+>", "", self.partner_id.comment or "").strip()
         return {
             "odoo_company_id": self.id,
             "name": self.name,
             "phone": self.phone or "",
             "email": self.email or "",
             "website": self.website or "",
-            "description": self.description or "",
+            "description": description,
             "address": {
                 "street": street_name,
                 "number": street_number,
@@ -86,10 +80,3 @@ class ResCompany(models.Model):
         for record in records:
             record._sync_to_api()
         return records
-
-    def write(self, vals):
-        result = super().write(vals)
-        if SYNC_FIELDS & vals.keys():
-            for record in self:
-                record._sync_to_api()
-        return result
