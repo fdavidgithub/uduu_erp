@@ -224,3 +224,5 @@ __marimo__/
 # Superpowers brainstorm sessions
 .superpowers/
 
+.agents-bootstrap
+AGENTS.md
