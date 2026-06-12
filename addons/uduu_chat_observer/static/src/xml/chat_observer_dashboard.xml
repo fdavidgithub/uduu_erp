@@ -8,7 +8,7 @@
                 <div class="o_chat_observer__error">
                     <t t-if="state.error === 'api_not_configured'">
                         API não configurada. Defina
-                        <strong>uduu_common.api_base_url</strong>
+                        <strong>uduu_base.api_base_url</strong>
                         em Configurações → Parâmetros do Sistema.
                     </t>
                     <t t-elif="state.error === 'api_unavailable'">

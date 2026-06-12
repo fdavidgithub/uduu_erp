@@ -9,6 +9,8 @@
     "depends": ["base"],
     "data": [
         "security/ir.model.access.csv",
+        "data/uduu_base_data.xml",
+        "views/res_company_views.xml",
     ],
     "demo": [],
     "installable": True,

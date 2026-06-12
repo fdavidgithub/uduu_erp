@@ -7,7 +7,7 @@ import requests
 from odoo import http
 from odoo.http import request
 
-from odoo.addons.chat_observer.utils.chat_phases import process_chats
+from odoo.addons.uduu_chat_observer.utils.chat_phases import process_chats
 
 _logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class ChatObserverController(http.Controller):
 
     @http.route("/chat_observer/chats", type="http", auth="user", methods=["GET"], csrf=False)
     def get_chats(self):
-        api_base_url = _get_param("uduu_common.api_base_url")
+        api_base_url = _get_param("uduu_base.api_base_url")
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
@@ -56,7 +56,7 @@ class ChatObserverController(http.Controller):
         if not phone.isdigit() or not (7 <= len(phone) <= 15):
             return _json_response({"error": "invalid_phone"}, status=400)
 
-        api_base_url = _get_param("uduu_common.api_base_url")
+        api_base_url = _get_param("uduu_base.api_base_url")
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 
@@ -90,7 +90,7 @@ class ChatObserverController(http.Controller):
         if not message:
             return _json_response({"error": "empty_message"}, status=400)
 
-        api_base_url = _get_param("uduu_common.api_base_url")
+        api_base_url = _get_param("uduu_base.api_base_url")
         if not api_base_url:
             return _json_response({"error": "api_not_configured"}, status=503)
 

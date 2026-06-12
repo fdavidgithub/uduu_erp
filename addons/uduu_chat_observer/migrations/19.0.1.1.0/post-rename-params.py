@@ -7,7 +7,7 @@ def migrate(cr, version):
     if not version:
         return
     renames = {
-        "chat_observer.api_base_url": "uduu_common.api_base_url",
+        "chat_observer.api_base_url": "uduu_base.api_base_url",
         "chat_observer.api_chats_path": "uduu_chat_observer.api_chats_path",
         "chat_observer.api_history_path": "uduu_chat_observer.api_history_path",
         "chat_observer.api_send_path": "uduu_chat_observer.api_send_path",
