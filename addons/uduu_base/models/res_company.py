@@ -41,35 +41,35 @@ class ResCompany(models.Model):
 
     def _sync_to_api(self):
         self.ensure_one()
-        base_url = self._get_param("uduu_common.api_base_url")
+        base_url = self._get_param("uduu_base.api_base_url")
         if not base_url:
             raise UserError(
                 "Integração com API não configurada. "
-                "Defina 'uduu_common.api_base_url' em Técnico → Parâmetros do Sistema."
+                "Defina 'uduu_base.api_base_url' em Técnico → Parâmetros do Sistema."
             )
-        post_path = self._get_param("uduu_company_sync.api_post_path", "/odoo/company")
+        post_path = self._get_param("uduu_base.api_post_path", "/odoo/company")
         url = f"{base_url}{post_path}"
         payload = self._build_sync_payload()
         try:
             resp = requests.post(url, json=payload, timeout=10)
             resp.raise_for_status()
         except requests.exceptions.ConnectionError as e:
-            _logger.error("uduu_company_sync: API indisponível: %s", e)
+            _logger.error("uduu_base: API indisponível: %s", e)
             raise UserError(
                 f"Não foi possível conectar à API ({base_url}). Verifique a conexão."
             ) from e
         except requests.exceptions.Timeout as e:
-            _logger.error("uduu_company_sync: Timeout: %s", e)
+            _logger.error("uduu_base: Timeout: %s", e)
             raise UserError(
                 f"Timeout ao chamar a API ({base_url}). Tente novamente."
             ) from e
         except requests.exceptions.HTTPError as e:
-            _logger.error("uduu_company_sync: HTTP %s: %s", resp.status_code, e)
+            _logger.error("uduu_base: HTTP %s: %s", resp.status_code, e)
             raise UserError(
                 f"Erro na API ao sincronizar empresa: HTTP {resp.status_code}."
             ) from e
         except requests.exceptions.RequestException as e:
-            _logger.error("uduu_company_sync: unexpected request error: %s", e)
+            _logger.error("uduu_base: unexpected request error: %s", e)
             raise UserError(
                 f"Erro inesperado ao sincronizar com a API ({base_url})."
             ) from e

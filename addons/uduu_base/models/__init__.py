@@ -1,2 +1,1 @@
-# Import models here as they are created
-# from . import res_partner
+from . import res_company, res_partner

@@ -12,10 +12,10 @@ class TestResCompanySync(TransactionCase):
         super().setUp()
         self.company = self.env.ref("base.main_company")
         self.env["ir.config_parameter"].sudo().set_param(
-            "uduu_common.api_base_url", "http://test.example.com"
+            "uduu_base.api_base_url", "http://test.example.com"
         )
         self.env["ir.config_parameter"].sudo().set_param(
-            "uduu_company_sync.api_post_path", "/odoo/company"
+            "uduu_base.api_post_path", "/odoo/company"
         )
 
     def _ok_mock(self):
@@ -24,7 +24,7 @@ class TestResCompanySync(TransactionCase):
         mock.raise_for_status = MagicMock()
         return mock
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_write_calls_post_with_correct_url(self, mock_post):
         mock_post.return_value = self._ok_mock()
         self.company.write({"name": self.company.name})
@@ -32,7 +32,7 @@ class TestResCompanySync(TransactionCase):
         url = mock_post.call_args[0][0]
         self.assertEqual(url, "http://test.example.com/odoo/company")
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_create_calls_post_endpoint(self, mock_post):
         mock_post.return_value = self._ok_mock()
         new_company = self.env["res.company"].create({"name": "Empresa Teste"})
@@ -43,24 +43,24 @@ class TestResCompanySync(TransactionCase):
 
     def test_write_blocks_when_base_url_empty(self):
         self.env["ir.config_parameter"].sudo().set_param(
-            "uduu_common.api_base_url", ""
+            "uduu_base.api_base_url", ""
         )
         with self.assertRaises(UserError):
             self.company.write({"name": self.company.name})
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_write_blocks_on_connection_error(self, mock_post):
         mock_post.side_effect = requests.exceptions.ConnectionError("refused")
         with self.assertRaises(UserError):
             self.company.write({"name": self.company.name})
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_write_blocks_on_timeout(self, mock_post):
         mock_post.side_effect = requests.exceptions.Timeout("timeout")
         with self.assertRaises(UserError):
             self.company.write({"name": self.company.name})
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_write_blocks_on_http_error(self, mock_post):
         mock = MagicMock()
         mock.status_code = 500
@@ -69,7 +69,7 @@ class TestResCompanySync(TransactionCase):
         with self.assertRaises(UserError):
             self.company.write({"name": self.company.name})
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_street_split_before_comma(self, mock_post):
         mock_post.return_value = self._ok_mock()
         self.company.write({"street": "Rua das Flores, 123"})
@@ -77,7 +77,7 @@ class TestResCompanySync(TransactionCase):
         self.assertEqual(payload["address"]["street"], "Rua das Flores")
         self.assertEqual(payload["address"]["number"], "123")
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_street_without_comma_has_empty_number(self, mock_post):
         mock_post.return_value = self._ok_mock()
         self.company.write({"street": "Rua das Flores"})
@@ -85,14 +85,14 @@ class TestResCompanySync(TransactionCase):
         self.assertEqual(payload["address"]["street"], "Rua das Flores")
         self.assertEqual(payload["address"]["number"], "")
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_street2_maps_to_neighborhood(self, mock_post):
         mock_post.return_value = self._ok_mock()
         self.company.write({"street2": "Centro"})
         payload = mock_post.call_args[1]["json"]
         self.assertEqual(payload["address"]["neighborhood"], "Centro")
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_state_name_sent_not_code(self, mock_post):
         mock_post.return_value = self._ok_mock()
         state = self.env["res.country.state"].search(
@@ -105,7 +105,7 @@ class TestResCompanySync(TransactionCase):
         self.assertEqual(payload["address"]["state"], state.name)
         self.assertNotEqual(payload["address"]["state"], "SP")
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_country_name_sent_not_code(self, mock_post):
         mock_post.return_value = self._ok_mock()
         country = self.env["res.country"].search([("code", "=", "BR")], limit=1)
@@ -116,14 +116,14 @@ class TestResCompanySync(TransactionCase):
         self.assertEqual(payload["address"]["country"], country.name)
         self.assertNotEqual(payload["address"]["country"], "BR")
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_description_field_in_payload(self, mock_post):
         mock_post.return_value = self._ok_mock()
         self.company.write({"description": "Tecnologia para vendas conversacionais"})
         payload = mock_post.call_args[1]["json"]
         self.assertEqual(payload["description"], "Tecnologia para vendas conversacionais")
 
-    @patch("odoo.addons.uduu_company_sync.models.res_company.requests.post")
+    @patch("odoo.addons.uduu_base.models.res_company.requests.post")
     def test_payload_has_all_required_fields(self, mock_post):
         mock_post.return_value = self._ok_mock()
         self.company.write({"name": self.company.name})
