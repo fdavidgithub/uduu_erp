@@ -2,7 +2,7 @@ import logging
 import re
 import requests
 
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -10,6 +10,8 @@ _logger = logging.getLogger(__name__)
 
 class ResCompany(models.Model):
     _inherit = "res.company"
+
+    comment = fields.Html(related="partner_id.comment", readonly=False, string="Notas")
 
     def _get_param(self, key, default=""):
         return self.env["ir.config_parameter"].sudo().get_param(key, default)
