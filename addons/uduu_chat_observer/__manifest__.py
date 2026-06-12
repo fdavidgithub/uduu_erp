@@ -15,11 +15,11 @@
     ],
     "assets": {
         "web.assets_backend": [
-            "chat_observer/static/src/scss/chat_observer.scss",
-            "chat_observer/static/src/xml/chat_observer_card.xml",
-            "chat_observer/static/src/xml/chat_observer_dashboard.xml",
-            "chat_observer/static/src/js/chat_observer_card.js",
-            "chat_observer/static/src/js/chat_observer_dashboard.js",
+            "uduu_chat_observer/static/src/scss/chat_observer.scss",
+            "uduu_chat_observer/static/src/xml/chat_observer_card.xml",
+            "uduu_chat_observer/static/src/xml/chat_observer_dashboard.xml",
+            "uduu_chat_observer/static/src/js/chat_observer_card.js",
+            "uduu_chat_observer/static/src/js/chat_observer_dashboard.js",
         ],
     },
     "installable": True,
