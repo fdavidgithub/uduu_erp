@@ -27,11 +27,11 @@ services:
       PORT: 5432
       USER: ${POSTGRES_USER:-uduu}
       PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-uduu}
     volumes:
       - erp_data:/var/lib/odoo
       - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
       - ./addons:/mnt/extra-addons:ro
-    command: ["odoo", "--config=/etc/odoo/odoo.conf"]
 
 volumes:
   db_data:
