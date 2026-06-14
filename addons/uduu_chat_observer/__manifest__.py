@@ -1,5 +1,5 @@
 {
-    "name": "Chat Observer",
+    "name": "Uduu Chat Observer",
     "version": "19.0.1.1.0",
     "summary": "Monitoramento em tempo real de chats em andamento",
     "author": "Uduu",
@@ -24,5 +24,5 @@
     },
     "installable": True,
     "auto_install": False,
-    "application": True,
+    "application": False,
 }
