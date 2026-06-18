@@ -4,8 +4,4 @@
         <field name="key">uduu_base.api_base_url</field>
         <field name="value"></field>
     </record>
-    <record id="param_api_post_path" model="ir.config_parameter">
-        <field name="key">uduu_base.api_post_path</field>
-        <field name="value">/odoo/company</field>
-    </record>
 </odoo>
